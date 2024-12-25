@@ -1,7 +1,9 @@
 import cv2
 from ultralytics import YOLO
-import  logging 
-from utils import calculate_center, has_crossed_line, prepare_osd_frames, update_obj_history
+import logging 
+from utils import (calculate_center, has_crossed_line, prepare_osd_frames,
+                   update_obj_history, write_output_video)
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -19,6 +21,7 @@ class Occupancy:
             exit()
 
         self.obj_history = dict()
+        self.osd_buffer = list()
 
     def process_tracks(self, results, frame):
         for result in results:
@@ -28,17 +31,19 @@ class Occupancy:
 
                 center = calculate_center(bbox=bbox)
                 prev_center = self.obj_history.get(object_id, None)
-                if has_crossed_line(prev_center, center, self.line):
-                    logger.info(f"Object {object_id} crossed the line!")
+                #if has_crossed_line(prev_center, center, self.line):
+                #    logger.info(f"Object {object_id} crossed the line!")
 
                 self.obj_history = update_obj_history(
                     object_histories=self.obj_history,
                     object_id=object_id,
                     center=center)
 
-                prepare_osd_frames(frame=frame, bbox=bbox,
+                osd_frame = prepare_osd_frames(frame=frame, bbox=bbox,
                                 center=center,
                                 line=self.line)
+
+                self.osd_buffer.append(osd_frame)
 
     def run(self):
         while self.cap.isOpened():
@@ -49,3 +54,5 @@ class Occupancy:
 
             results = self.model.track(source=frame, tracker="bytetrack.yaml")
             self.process_tracks(results=results, frame=frame)
+        
+        write_output_video(self.osd_buffer, "out.mp4", fps=25)

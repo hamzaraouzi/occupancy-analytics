@@ -11,7 +11,7 @@ class Occupancy:
     def __init__(self, source, model):
         self.model = YOLO(model)
         self.cap = cv2.VideoCapture(source)
-        self.line = "..."
+        self.line = [(100, 200), (500, 200)] #TODO: to be changed later.
         self.msg_broker = None
 
         if not self.cap.isOpened():
@@ -21,22 +21,23 @@ class Occupancy:
         self.obj_history = dict()
 
     def process_tracks(self, results, frame):
-        for track in results.boxes.tracks:
-            object_id = track.id
-            bbox = track.xyxy
-            center = calculate_center(bbox=bbox)
-            prev_center = self.prev_center[object_id]
-            if has_crossed_line(prev_center, center, self.line):
-                logger.info(f"Object {object_id} crossed the line!")
+        for result in results:
+            for box in result.boxes:
+                object_id = box.id
+                bbox = box.xyxy
+                center = calculate_center(bbox=bbox)
+                prev_center = self.prev_center[object_id]
+                if has_crossed_line(prev_center, center, self.line):
+                    logger.info(f"Object {object_id} crossed the line!")
 
-            self.obj_history = update_obj_history(
-                object_histories=self.obj_history,
-                object_id=object_id,
-                center=center)
+                self.obj_history = update_obj_history(
+                    object_histories=self.obj_history,
+                    object_id=object_id,
+                    center=center)
 
-            prepare_osd_frames(frame=frame, bbox=bbox,
-                               center=center,
-                               line=self.line)
+                prepare_osd_frames(frame=frame, bbox=bbox,
+                                center=center,
+                                line=self.line)
 
     def run(self):
         while self.cap.isOpened():
@@ -45,5 +46,5 @@ class Occupancy:
                 logger.error("Stream ended or error occured")
                 break
 
-            results = self.model.track(source=frame, stream=True, tracker="bytetrack.yaml")
+            results = self.model.track(source=frame, tracker="bytetrack.yaml")
             self.process_tracks(results=results, frame=frame)

@@ -8,3 +8,7 @@ from occupancy import Occupancy
 def main(source, model):
     occupancy = Occupancy(source, model)
     occupancy.run()
+
+
+if __name__ == "__main__":
+    main()

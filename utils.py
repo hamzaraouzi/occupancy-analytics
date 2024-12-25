@@ -7,6 +7,9 @@ def calculate_center(bbox):
 
 
 def has_crossed_line(prev_center, current_center, line):
+    if prev_center is None:
+        return False
+
     x1, y1 = prev_center
     x2, y2 = current_center
     (lx1, ly1), (lx2, ly2) = line
@@ -26,6 +29,6 @@ def prepare_osd_frames(frame, bbox, center, line):
 
 def update_obj_history(object_histories, object_id, center):
     if object_id not in object_histories:
-        object_histories[object_id] = []
+        object_histories[object_id] = [center]
     object_histories[object_id].append(center)
     return object_histories

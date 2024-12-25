@@ -23,10 +23,11 @@ class Occupancy:
     def process_tracks(self, results, frame):
         for result in results:
             for box in result.boxes:
-                object_id = box.id
-                bbox = box.xyxy
+                object_id = int(box.id.numpy()[0])
+                bbox = box.xyxy[0].numpy().tolist()
+
                 center = calculate_center(bbox=bbox)
-                prev_center = self.prev_center[object_id]
+                prev_center = self.obj_history.get(object_id, None)
                 if has_crossed_line(prev_center, center, self.line):
                     logger.info(f"Object {object_id} crossed the line!")
 

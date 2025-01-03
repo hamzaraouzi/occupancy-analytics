@@ -2,26 +2,37 @@ import cv2
 
 
 def calculate_center(bbox):
-    center = ((bbox[0] + bbox[2]) // 2, (bbox[1] + bbox[3]) // 2)
+    center = (int((bbox[0] + bbox[2]) // 2), int((bbox[1] + bbox[3]) // 2))
     return center
 
 
 def has_crossed_line(prev_center, current_center, line):
     if prev_center is None:
-        return False
+        return False, ""
 
-    x1, y1 = prev_center
+    x1, y1 = prev_center[-1]
     x2, y2 = current_center
     (lx1, ly1), (lx2, ly2) = line
 
     prev_sign = (lx2 - lx1) * (y1 - ly1) - (ly2 - ly1) * (x1 - lx1)
     curr_sign = (lx2 - lx1) * (y2 - ly1) - (ly2 - ly1) * (x2 - lx1)
 
-    return prev_sign * curr_sign < 0
+    if prev_sign * curr_sign < 0:  # Opposite signs indicate crossing
+        # Determine direction based on crossing vector
+        direction = (lx2 - lx1) * (y2 - y1) - (ly2 - ly1) * (x2 - x1)
+        if direction > 0:
+            return True, "exit"
+        else:
+            return True, "entry"
+
+    return False, ""
 
 
-def prepare_osd_frames(frame, bbox, center, line):
+def prepare_osd_frames(frame, bbox, center, line, obj_id):
     cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
+    cv2.putText(frame, f'#{obj_id}', (int(bbox[0]), int(bbox[1])),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1, (255, 0, 0), 2, cv2.LINE_AA)
     cv2.circle(frame, center, 5, (0, 255, 255), -1)
     cv2.line(frame, line[0], line[1], (0, 0, 255), 2)
     return frame

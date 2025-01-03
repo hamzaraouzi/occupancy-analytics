@@ -21,9 +21,9 @@ def has_crossed_line(prev_center, current_center, line):
         # Determine direction based on crossing vector
         direction = (lx2 - lx1) * (y2 - y1) - (ly2 - ly1) * (x2 - x1)
         if direction > 0:
-            return True, "exit"
-        else:
             return True, "entry"
+        else:
+            return True, "exit"
 
     return False, ""
 

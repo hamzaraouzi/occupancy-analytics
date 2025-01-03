@@ -13,8 +13,8 @@ class Occupancy:
     def __init__(self, source, model):
         self.model = YOLO(model).to("cuda")
         self.cap = cv2.VideoCapture(source)
-        self.line = [(750, 200), (950, 1250)] #TODO: to be changed later.
-        self.msg_handler = MessageHandler()
+        self.line = [(750, 200), (950, 1250)]
+        self.msg_handler = MessageHandler(bootstrap_server="", topic="")
 
         if not self.cap.isOpened():
             logger.error("Error: Unable to open RTSP stream.")
@@ -28,14 +28,15 @@ class Occupancy:
             for box in result.boxes:
                 object_id = int(box.id.cpu().numpy()[0])
                 bbox = box.xyxy[0].cpu().numpy().tolist()
-                print(bbox, "+++++++++++++++++")
-                cls = None #TODO read the class
+                cls = int(box.cls.cpu()) #TODO read the class
                 center = calculate_center(bbox=bbox)
                 prev_center = self.obj_history.get(object_id, None)
-                line_is_crossed, direction = has_crossed_line(prev_center, center, self.line)
+                line_is_crossed, direction = has_crossed_line(prev_center,
+                                                              center,
+                                                              self.line)
                 if line_is_crossed:
                     logging.info(f"Object {object_id}: {direction} ")
-                    #self.msg_handler.send_event(direction, cls)
+                    self.msg_handler.send_event(direction, cls)
 
                 self.obj_history = update_obj_history(
                     object_histories=self.obj_history,

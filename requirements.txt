@@ -1,0 +1,7 @@
+numpy 
+opencv-python 
+opencv-python-headless 
+cython
+ultralytics
+kafka-python
+numpy

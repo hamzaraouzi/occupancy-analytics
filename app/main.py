@@ -39,9 +39,7 @@ def out_rtsp_stream(ip, port, width=640, height=480, fps=30):
     )
     try:
         while True:
-            try:
-                # Get a frame from the queue
-                frame = osd_queue.get()
+            frame = osd_queue.get()
             # Write the frame to FFmpeg's stdin
             process.stdin.write(frame.tobytes())
     except Exception as e:

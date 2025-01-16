@@ -29,7 +29,7 @@ def event_streaming(bootstrap_server: str, topic: str):
         handler.send_event(**data)
 
 
-def out_rtsp_stream(ip_rtsp, port_rtsp):
+def out_rtsp_stream(ip, port):
     while True:
         frame = osd_queue.get()
         print("render out frame")

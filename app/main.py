@@ -5,6 +5,7 @@ import threading
 from msghandler import MessageHandler
 import os
 import logging
+import ffmpeg
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -29,10 +30,26 @@ def event_streaming(bootstrap_server: str, topic: str):
         handler.send_event(**data)
 
 
-def out_rtsp_stream(ip, port):
-    while True:
-        frame = osd_queue.get()
-        print("render out frame")
+def out_rtsp_stream(ip, port, width=640, height=480, fps=30):
+    process = (
+        ffmpeg
+        .input('pipe:', format='rawvideo', pix_fmt='rgb24', s=f'{width}x{height}', r=fps)
+        .output(f'rtp://{ip}:{port}', vcodec='libx264', pix_fmt='yuv420p', r=fps, preset='ultrafast', tune='zerolatency')
+        .run_async(pipe_stdin=True)
+    )
+    try:
+        while True:
+            try:
+                # Get a frame from the queue
+                frame = osd_queue.get()
+            # Write the frame to FFmpeg's stdin
+            process.stdin.write(frame.tobytes())
+    except Exception as e:
+        print(f"Error during streaming: {e}")
+    finally:
+        # Close FFmpeg stdin and wait for the process to finish
+        process.stdin.close()
+        process.wait()
 
 
 @click.command()

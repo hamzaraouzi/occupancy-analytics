@@ -20,7 +20,8 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean
 
 # Install additional Python dependencies if needed
-RUN pip3 install matplotlib  kafka-python click ultralytics ffmpeg-python
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
 
 
 COPY app/ app/

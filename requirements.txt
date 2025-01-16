@@ -1,7 +1,4 @@
-#matplotlib
-#opencv-python 
-#opencv-python-headless 
-#cython
+matplotlib
 ultralytics
 kafka-python
 click

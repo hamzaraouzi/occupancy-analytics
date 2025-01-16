@@ -22,9 +22,10 @@ RUN apt-get update && apt-get install -y \
 RUN pip3 install matplotlib  kafka-python click ultralytics
 
 
+COPY app/ app/
 COPY model.pt model.pt
 # Set work directory
-WORKDIR /app
+WORKDIR /app/
 
 # Default command to keep the container running (can be overridden)
 ENTRYPOINT ["python3", "main.py", "--model", "../model.pt"]

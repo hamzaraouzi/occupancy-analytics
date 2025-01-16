@@ -1,7 +1,7 @@
-numpy 
-opencv-python 
-opencv-python-headless 
-cython
+#matplotlib
+#opencv-python 
+#opencv-python-headless 
+#cython
 ultralytics
 kafka-python
-numpy
+click

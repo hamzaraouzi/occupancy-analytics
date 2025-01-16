@@ -1,8 +1,8 @@
 import click
-from app.occupancy import Occupancy
+from occupancy import Occupancy
 from queue import Queue
 import threading
-from app.msghandler import MessageHandler
+from msghandler import MessageHandler
 import cv2
 import logging
 
@@ -91,11 +91,11 @@ def main(source, model, bootstrap_server, topic, ip_rtsp, port_rtsp):
 
     inference_thread.start()
     # event_streaming_thread.start()
-    osd_rtsp_stream_thread.start()
+    #osd_rtsp_stream_thread.start()
 
     inference_thread.join()
     # event_streaming_thread.join()
-    osd_rtsp_stream_thread.join()
+    #osd_rtsp_stream_thread.join()
 
 
 if __name__ == "__main__":

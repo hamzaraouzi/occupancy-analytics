@@ -1,7 +1,7 @@
 import cv2
 from ultralytics import YOLO
 import logging
-from app.utils import (calculate_center, has_crossed_line, prepare_osd_frames,
+from utils import (calculate_center, has_crossed_line, prepare_osd_frames,
                        update_obj_history)
 
 from queue import Queue
@@ -66,4 +66,4 @@ class Occupancy:
                                        tracker="bytetrack.yaml")
             self.process_tracks(results=results, frame=frame)
     
-        # ßwrite_output_video(self.osd_buffer, "out.mp4", fps=25)
+        # write_output_video(self.osd_buffer, "out.mp4", fps=25)

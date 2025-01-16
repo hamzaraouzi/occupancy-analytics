@@ -18,14 +18,13 @@ RUN apt-get update && apt-get install -y \
     python3-opencv \
     && apt-get clean
 
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+# Install additional Python dependencies if needed
+RUN pip3 install matplotlib  kafka-python click ultralytics
 
-COPY app/ app/
+
 COPY model.pt model.pt
-
 # Set work directory
 WORKDIR /app
 
 # Default command to keep the container running (can be overridden)
-CMD ["Python", "main.py", "--model", "../model.pt"]
+ENTRYPOINT ["python3", "main.py", "--model", "../model.pt"]

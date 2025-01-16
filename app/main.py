@@ -29,6 +29,12 @@ def event_streaming(bootstrap_server: str, topic: str):
         handler.send_event(**data)
 
 
+def out_rtsp_stream():
+    while True:
+        frame = osd_queue.get()
+        print("render out frame")
+
+
 @click.command()
 @click.option("--source", type=str, help="rtsp link or video path")
 @click.option("--model", type=str, help="model artifact")
@@ -46,7 +52,7 @@ def main(source, model, bootstrap_server, topic):
     #                                          kwargs={"bootstrap_server":
     #                                                  bootstrap_server,
     #                                                  "topic": topic})
-    
+
     inference_thread.start()
     # event_streaming_thread.start()
 

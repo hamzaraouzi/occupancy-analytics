@@ -44,12 +44,12 @@ class Occupancy:
                     object_id=object_id,
                     center=center)
 
-                osd_frame = prepare_osd_frames(frame=frame, bbox=bbox,
-                                               center=center,
-                                               line=self.line,
-                                               obj_id=object_id)
+                # osd_frame = prepare_osd_frames(frame=frame, bbox=bbox,
+                #                               center=center,
+                #                               line=self.line,
+                #                               obj_id=object_id)
 
-            self.osd_queue.put(osd_frame)
+            # self.osd_queue.put(osd_frame)
 
     def run(self):
         frame_skip_cnt = 0

@@ -25,13 +25,14 @@ def event_streaming(bootstrap_server: str, topic: str):
     handler = MessageHandler(bootstrap_server=bootstrap_server,
                              topic=topic)
     while True:
-        data = msg_queue[0]
+        if len(msg_queue) > 0:
+            data = msg_queue[0]
 
-        sucess = handler.send_event(**data)
-        if sucess:
-            msg_queue.pop[0]
-        else:
-            continue
+            sucess = handler.send_event(**data)
+            if sucess:
+                msg_queue.pop[0]
+            else:
+                continue
 
 
 @click.command()
@@ -53,11 +54,10 @@ def main(source, model, bootstrap_server, topic):
                                                      "topic": topic})
 
     inference_thread.start()
-    # event_streaming_thread.start()
-    
+    event_streaming_thread.start()
 
     inference_thread.join()
-    # event_streaming_thread.join()
+    event_streaming_thread.join()
 
 
 if __name__ == "__main__":

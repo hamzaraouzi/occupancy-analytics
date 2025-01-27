@@ -2,7 +2,7 @@ from kafka import KafkaProducer
 import logging
 import json
 import datetime
-
+from time import sleep
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -37,5 +37,5 @@ class MessageHandler:
         success = None
         future = self.producer.send(self.topic, value=data)
         future.add_callback(on_success).add_errback(on_error)
-
+        sleep(5)
         return success

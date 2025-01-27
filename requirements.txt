@@ -1,0 +1,4 @@
+matplotlib
+ultralytics
+kafka-python
+click

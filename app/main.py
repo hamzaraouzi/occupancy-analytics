@@ -5,7 +5,6 @@ import threading
 from msghandler import MessageHandler
 import os
 import logging
-import ffmpeg
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

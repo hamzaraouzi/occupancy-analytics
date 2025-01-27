@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 osd_queue = Queue()
-msg_queue = Queue()
+msg_queue = list()
 
 
 def inference(source: str, model: str):
@@ -26,8 +26,13 @@ def event_streaming(bootstrap_server: str, topic: str):
     handler = MessageHandler(bootstrap_server=bootstrap_server,
                              topic=topic)
     while True:
-        data = msg_queue.get()
-        handler.send_event(**data)
+        data = msg_queue[0]
+
+        sucess = handler.send_event(**data)
+        if sucess:
+            msg_queue.pop[0]
+        else:
+            continue
 
 
 @click.command()

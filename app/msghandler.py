@@ -14,7 +14,9 @@ class MessageHandler:
         self.topic = topic
         self.producer = KafkaProducer(
             bootstrap_servers=self.bootstrap_server,
-            value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+            value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+            acks='all'
+            )
 
     def send_event(self, direction, cls):
         time_stamp = datetime.datetime.now()
@@ -23,4 +25,17 @@ class MessageHandler:
                 "direction": direction,
                 "obj_class": cls}
 
-        self.producer.send(self.topic, value=data)
+        def on_success(record_metadata):
+            nonlocal success
+            success = True
+
+        def on_error(ex):
+            nonlocal success
+            success = False
+            logger.error("Failed to send message")
+
+        success = None
+        future = self.producer.send(self.topic, value=data)
+        future.add_callback(on_success).add_errback(on_error)
+
+        return success

@@ -5,18 +5,21 @@ import threading
 from msghandler import MessageHandler
 import os
 import logging
+from yolov8_tensorrt import YOLOv8TensorRT
+from bytetracker import ByteTracker
+from typing import List
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-osd_queue = Queue()
 msg_queue = list()
 
 
-def inference(source: str, model: str):
+def inference(source: str, model: YOLOv8TensorRT, tracker: ByteTracker, line: List[int]):
     occupancy = Occupancy(source, model,
-                          osd_queue=osd_queue,
+                          tracker=tracker,
+                          line=line,
                           msg_queue=msg_queue)
     occupancy.run()
 
@@ -45,19 +48,25 @@ def main(source, model, bootstrap_server, topic):
     bootstrap_server = os.getenv("bootstrap_server", bootstrap_server) 
     topic = os.getenv("topic", topic)
 
+    model = YOLOv8TensorRT(engine_path=model)
+    tracker = ByteTracker(track_thresh=0.5, match_thresh=0.8)
+    line = [(750, 200), (950, 1250)]
+
     inference_thread = threading.Thread(target=inference,
                                         kwargs={"model": model,
+                                                "tracker": tracker,
+                                                "line": line,
                                                 "source": source})
-    event_streaming_thread = threading.Thread(target=event_streaming,
-                                              kwargs={"bootstrap_server":
-                                                      bootstrap_server,
-                                                     "topic": topic})
+    #event_streaming_thread = threading.Thread(target=event_streaming,
+    #                                          kwargs={"bootstrap_server":
+    #                                                  bootstrap_server,
+    #                                                 "topic": topic})
 
     inference_thread.start()
-    event_streaming_thread.start()
+    #event_streaming_thread.start()
 
     inference_thread.join()
-    event_streaming_thread.join()
+    #event_streaming_thread.join()
 
 
 if __name__ == "__main__":

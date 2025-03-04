@@ -1,4 +1,5 @@
 matplotlib
-ultralytics
+pycuda
+bytetracker
 kafka-python
 click

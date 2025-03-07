@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class LineCrossing(threading.Thread):
     def __init__(self, source, model, tracker, line, msg_queue: Queue):
         super().__init__()
-        self.model = model = YOLOv8TensorRT(engine_path=model)
+        self.model = YOLOv8TensorRT(engine_path=model)
         self.source = source
         self.line = line
         self.msg_queue = msg_queue

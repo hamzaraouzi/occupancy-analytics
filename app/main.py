@@ -53,7 +53,7 @@ def main(source, model, bootstrap_server, topic):
     line = [(750, 200), (950, 1250)]
 
     line_crossing = LineCrossing(source=source, model=model, tracker=tracker,
-                                 line=line)
+                                 line=line, msg_queue=msg_queue)
     #inference_thread = threading.Thread(target=inference,
     #                                    kwargs={"model": model,
     #                                            "tracker": tracker,

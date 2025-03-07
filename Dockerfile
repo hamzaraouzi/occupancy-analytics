@@ -1,5 +1,5 @@
 # Base image
-FROM nvidia/cuda:11.8.0-runtime-ubuntu20.04
+FROM nvcr.io/nvidia/l4t-base:35.4.1
 
 # Set non-interactive mode for apt-get
 ENV DEBIAN_FRONTEND=noninteractive
@@ -25,9 +25,9 @@ RUN pip3 install -r requirements.txt
 
 
 COPY app/ app/
-COPY model.pt model.pt
+COPY yolov8n.trt yolov8n.trt
 # Set work directory
 WORKDIR /app/
 
 # Default command to keep the container running (can be overridden)
-ENTRYPOINT ["python3", "main.py", "--model", "../model.pt"]
+ENTRYPOINT ["python3", "main.py", "--model", "yolov8n.trt"]

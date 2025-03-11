@@ -10,21 +10,10 @@ from bytetracker import BYTETracker
 from typing import List
 
 
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 msg_queue = list()
-
-
-#def inference(source: str, model: str, tracker: BYTETracker, line: List[int]):
-#    occupancy = Occupancy(source, model,
-#                          tracker=tracker,
-#                          line=line,
-#                          msg_queue=msg_queue)
-#    occupancy.run()
-
 
 def event_streaming(bootstrap_server: str, topic: str):
     handler = MessageHandler(bootstrap_server=bootstrap_server,

@@ -55,7 +55,6 @@ class LineCrossing(threading.Thread):
                 break
 
             detections = self.model.infer(frame=frame)
-            print(detections)
     
     def stop(self):
         self.running = False

@@ -54,7 +54,7 @@ class LineCrossing(threading.Thread):
                 logger.error("Stream ended or error occured")
                 break
 
-            detections = self.model.infer(frame=frame)
-    
+            bboxes, scores, class_ids = self.model.infer(frame=frame)
+
     def stop(self):
         self.running = False

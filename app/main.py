@@ -43,11 +43,7 @@ def main(source, model, bootstrap_server, topic):
 
     line_crossing = LineCrossing(source=source, model=model, tracker=tracker,
                                  line=line, msg_queue=msg_queue)
-    #inference_thread = threading.Thread(target=inference,
-    #                                    kwargs={"model": model,
-    #                                            "tracker": tracker,
-    #                                            "line": line,
-    #                                            "source": source})
+
     #event_streaming_thread = threading.Thread(target=event_streaming,
     #                                          kwargs={"bootstrap_server":
     #                                                  bootstrap_server,

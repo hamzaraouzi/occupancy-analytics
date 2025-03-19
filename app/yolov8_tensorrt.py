@@ -7,15 +7,20 @@ import cv2
 
 
 class YOLOv8TensorRT:
-    def __init__(self, 
-                 engine_path, 
-                 original_shape = (960, 540),
-                 input_shape = (1, 3, 640, 640)):
+    def __init__(self,
+                 engine_path,
+                 original_shape=(720, 1280),
+                 input_shape=(1, 3, 640, 640),
+                 conf_threshold=0.3,
+                 iou_threshold=0.9,
+                 num_classes=80):
         self.engine_path = engine_path
         self.local_data = threading.local()
         self.input_shape = input_shape
-        self.output_shape = (1, 84, 8400)     # Update for your model
+        self.output_shape = (1, num_classes+4, 8400)
         self.original_shape = original_shape
+        self.conf_threshold = conf_threshold
+        self.iou_threshold = iou_threshold
 
     def load_model(self):
         """Initialize CUDA context and TensorRT resources for this thread"""
@@ -95,51 +100,54 @@ class YOLOv8TensorRT:
         self.local_data.stream.synchronize()
         return host_output
 
-    def decode_output(self, output, conf_thresh=0.5,
-                      iou_thresh=0.5):
-        output = output.reshape(84, 8400).T
-        bbox_data = output[:, 0:4]
-        cx, cy, w, h = (bbox_data[:, 0], bbox_data[:, 1], bbox_data[:, 2],
-                        bbox_data[:, 3])
+    def decode_output(self, output_tensor):
+        # Reshape the output tensor
+        output = output_tensor.squeeze(0)  # Shape: (84, 8400)
+        output = output.transpose(1, 0)    # Shape: (8400, 84)
 
+        # Split into bounding boxes and class probabilities
+        bbox_data = output[:, 0:4]    # (cx, cy, w, h) for 8400 anchors
+        cls_scores = output[:, 4:84]  # Class probabilities (80 values per anchor)
+
+        # Convert bounding boxes to (x1, y1, x2, y2)
+        cx, cy, w, h = bbox_data[:, 0], bbox_data[:, 1], bbox_data[:, 2], bbox_data[:, 3]
         x1 = cx - w / 2
-        x2 = cx + w / 2
         y1 = cy - h / 2
+        x2 = cx + w / 2
         y2 = cy + h / 2
         boxes = np.stack([x1, y1, x2, y2], axis=1)
 
-        obj_scores = output[:, 4]
-        cls_scores = output[:, 5:]
-        max_cls_scores = np.max(cls_scores, axis=1)
-        conf_scores = obj_scores * max_cls_scores
+        # Get confidence scores and class IDs
+        conf_scores = np.max(cls_scores, axis=1)  # Max class probability per anchor
+        class_ids = np.argmax(cls_scores, axis=1)
 
-        keep = conf_scores > conf_thresh
+        # Filter out low-confidence predictions
+        keep = conf_scores > self.conf_threshold
         boxes = boxes[keep]
         conf_scores = conf_scores[keep]
-        class_ids = np.argmax(output[keep, 5:], axis=1)
+        class_ids = class_ids[keep]
 
-        boxes_xywh = boxes.copy()
-        boxes_xywh[:, 2] = boxes[:, 2] - boxes[:, 0]
-        boxes_xywh[:, 3] = boxes[:, 3] - boxes[:, 1]
-
+        # Apply Non-Maximum Suppression (NMS)
         nms_indices = cv2.dnn.NMSBoxes(
-            bboxes=boxes_xywh.tolist(),
+            bboxes=boxes.tolist(),
             scores=conf_scores.tolist(),
-            score_threshold=conf_thresh,
-            nms_threshold=iou_thresh,
+            score_threshold=self.conf_threshold,
+            nms_threshold=self.iou_threshold,
             top_k=1000
         )
 
-        final_boxes = self.scale_boxes(boxes[nms_indices])
-        final_scores = boxes[nms_indices]
+        # Get final detections
+        final_boxes = boxes[nms_indices]
+        final_scores = conf_scores[nms_indices]
         final_class_ids = class_ids[nms_indices]
-        return final_boxes, final_scores, final_class_ids
+
+        return self.scale_boxes(final_boxes), final_scores, final_class_ids
 
     def scale_boxes(self, boxes):
         # original_shape: (height, width) of the original image
         # model_input_shape: (height, width) used for inference
         height_ratio = self.original_shape[0] / self.input_shape[2]
-        width_ratio = self.original_shape[1] / self.input_shape[1]
+        width_ratio = self.original_shape[1] / self.input_shape[3]
         
         boxes[:, [0, 2]] *= width_ratio   # Scale x coordinates
         boxes[:, [1, 3]] *= height_ratio  # Scale y coordinates

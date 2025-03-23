@@ -52,7 +52,7 @@ class LineCrossing(threading.Thread):
                 break
 
             bboxes, scores, class_ids = self.model.infer(frame=frame)
-            tracked_objects = self.tracker.track_objects(bboxes, (720, 1280))
+            tracked_objects = self.tracker.track_objects(bboxes, scores, (720, 1280))
             self.process_tracks(tracked_objects)
 
     def stop(self):

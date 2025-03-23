@@ -36,7 +36,7 @@ def main(source, model, bootstrap_server, topic):
     source = os.getenv("source", source)
     bootstrap_server = os.getenv("bootstrap_server", bootstrap_server) 
     topic = os.getenv("topic", topic)
-    tracker = ObjectTracker(track_thresh=0.5, match_tresh=0.8)
+    tracker = ObjectTracker(track_thresh=0.5, match_tresh=0.8, track_buffer=30)
     line = [(750, 200), (950, 1250)]
 
     line_crossing = LineCrossing(source=source, model=model, tracker=tracker,

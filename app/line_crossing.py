@@ -44,7 +44,6 @@ class LineCrossing(threading.Thread):
     def run(self):
         self.runnig = True
         cap = cv2.VideoCapture(self.source)
-
         while cap.isOpened():
 
             ret, frame = cap.read()
@@ -53,7 +52,7 @@ class LineCrossing(threading.Thread):
                 break
 
             bboxes, scores, class_ids = self.model.infer(frame=frame)
-            tracked_objects = self.tracker.track_objects(bboxes)
+            tracked_objects = self.tracker.track_objects(bboxes, (720, 1280))
             self.process_tracks(tracked_objects)
 
     def stop(self):

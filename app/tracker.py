@@ -16,12 +16,12 @@ class ObjectTracker:
             detections.append([*bbox, score])
         return np.array(detections)
 
-    def track_objects(self, detections):
+    def track_objects(self, detections, image_size):
 
         if len(detections) == 0:
             return []
 
-        online_targets = self.tracker.update(detections)
+        online_targets = self.tracker.update(detections, image_size=image_size)
         tracked_objects = []
         for track in online_targets:
             track_id = track.track_id

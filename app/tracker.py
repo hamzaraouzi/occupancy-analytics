@@ -16,12 +16,17 @@ class ObjectTracker:
             detections.append([*bbox, score])
         return np.array(detections)
 
-    def track_objects(self, detections, image_size):
+    def track_objects(self, bboxs, scores, image_size):
 
-        if len(detections) == 0:
+        if bboxs.shape[0] == 0:
             return []
 
-        online_targets = self.tracker.update(torch.from_numpy(detections), img_size=image_size, 
+        detections = self.perepare_tracker_input(
+            bboxes=bboxs,
+            scores=scores
+        )
+        online_targets = self.tracker.update(torch.from_numpy(detections),
+                                             img_size=image_size,
                                              img_info=None)
         tracked_objects = []
         for track in online_targets:

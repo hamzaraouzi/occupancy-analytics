@@ -1,7 +1,7 @@
 import cv2
 import logging
 from utils import (calculate_center, has_crossed_line,
-                   update_obj_history, track_objects)
+                   update_obj_history)
 
 from queue import Queue
 from yolov8_tensorrt import YOLOv8TensorRT
@@ -53,7 +53,7 @@ class LineCrossing(threading.Thread):
                 break
 
             bboxes, scores, class_ids = self.model.infer(frame=frame)
-            tracked_objects = self.tracker.track_objects(bboxes, scores)
+            tracked_objects = self.tracker.track_objects(bboxes)
             self.process_tracks(tracked_objects)
 
     def stop(self):

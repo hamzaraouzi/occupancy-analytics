@@ -21,7 +21,8 @@ class ObjectTracker:
         if len(detections) == 0:
             return []
 
-        online_targets = self.tracker.update(detections, image_size=image_size)
+        online_targets = self.tracker.update(detections, img_size=image_size, 
+                                             img_info=None)
         tracked_objects = []
         for track in online_targets:
             track_id = track.track_id

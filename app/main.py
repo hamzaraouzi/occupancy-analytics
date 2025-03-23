@@ -34,9 +34,9 @@ def event_streaming(bootstrap_server: str, topic: str):
 @click.option("--topic", type=str, help="kafka topic where to push event")
 def main(source, model, bootstrap_server, topic):
     source = os.getenv("source", source)
-    bootstrap_server = os.getenv("bootstrap_server", bootstrap_server)
+    bootstrap_server = os.getenv("bootstrap_server", bootstrap_server) 
     topic = os.getenv("topic", topic)
-    tracker = ObjectTracker()
+    tracker = ObjectTracker(track_thresh=0.5, match_tresh=0.8)
     line = [(750, 200), (950, 1250)]
 
     line_crossing = LineCrossing(source=source, model=model, tracker=tracker,

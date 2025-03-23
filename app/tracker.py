@@ -27,7 +27,7 @@ class ObjectTracker:
         )
         online_targets = self.tracker.update(torch.from_numpy(detections),
                                              img_size=image_size,
-                                             img_info=None)
+                                             img_info=list(image_size))
         tracked_objects = []
         for track in online_targets:
             track_id = track.track_id

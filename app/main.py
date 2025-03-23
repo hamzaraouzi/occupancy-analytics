@@ -6,7 +6,7 @@ from msghandler import MessageHandler
 import os
 import logging
 from typing import List
-from tracker import ObjectTracker
+from object_tracker import ObjectTracker
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

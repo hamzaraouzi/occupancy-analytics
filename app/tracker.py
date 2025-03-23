@@ -1,7 +1,8 @@
 import numpy as np
-from yolox.tracker.byte_tracker import BYTETracker
 from argparse import Namespace
 import torch
+from tracker.byte_tracker import BYTETracker
+
 class ObjectTracker:
     def __init__(self, **kwargs):
         args = Namespace(**kwargs)

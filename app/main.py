@@ -34,7 +34,7 @@ def event_streaming(bootstrap_server: str, topic: str):
 @click.option("--topic", type=str, help="kafka topic where to push event")
 def main(source, model, bootstrap_server, topic):
     source = os.getenv("source", source)
-    bootstrap_server = os.getenv("bootstrap_server", bootstrap_server) 
+    bootstrap_server = os.getenv("bootstrap_server", bootstrap_server)
     topic = os.getenv("topic", topic)
     tracker = ObjectTracker()
     line = [(750, 200), (950, 1250)]

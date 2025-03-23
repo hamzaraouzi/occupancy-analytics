@@ -1,28 +1,11 @@
 import numpy as np
 from yolox.tracker.byte_tracker import BYTETracker
-import argparse
+from argparse import Namespace
 
 class ObjectTracker:
-    def __init__(self. **kwargs):
-        args = self.make_parser().parse_args()
-        self.tracker = BYTETracker(args)
-    
-    def make_parser(self):
-        parser = argparse.ArgumentParser("ByteTracker arguments")
-
-        parser.add_argument("--track_thresh", type=float, default=0.5,
-                            help="tracking confidence threshold")
-        parser.add_argument("--track_buffer", type=int, default=30,
-                            help="the frames for keep lost tracks")
-        parser.add_argument("--match_thresh", type=float, default=0.6,
-                            help="matching threshold for tracking")
-        
-        parser.add_argument(
-            "--aspect_ratio_thresh", type=float, default=1.6,
-            help="threshold for filtering out boxes of which aspect ratio are above the given value.")
-        parser.add_argument('--min_box_area', type=float, default=10, help='filter out tiny boxes')
-        return parser
-
+    def __init__(self, **kwargs):
+        args = Namespace(**kwargs)
+        self.tracker = BYTETracker(args=args)
 
     def perepare_tracker_input(self, bboxes, scores):
         detections = []

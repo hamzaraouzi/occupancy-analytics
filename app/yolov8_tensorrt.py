@@ -21,6 +21,7 @@ class YOLOv8TensorRT:
         self.original_shape = original_shape
         self.conf_threshold = conf_threshold
         self.iou_threshold = iou_threshold
+        self.num_classes = num_classes
 
     def load_model(self):
         """Initialize CUDA context and TensorRT resources for this thread"""
@@ -95,7 +96,7 @@ class YOLOv8TensorRT:
     def _get_output(self):
         """Retrieve and postprocess output"""
         host_output = np.empty(self.output_shape, dtype=np.float32)
-        cuda.memcpy_dtoh_async(host_output, self.local_data.output_mem, 
+        cuda.memcpy_dtoh_async(host_output, self.local_data.output_mem,
                                self.local_data.stream)
         self.local_data.stream.synchronize()
         return host_output
@@ -107,7 +108,7 @@ class YOLOv8TensorRT:
 
         # Split into bounding boxes and class probabilities
         bbox_data = output[:, 0:4]    # (cx, cy, w, h) for 8400 anchors
-        cls_scores = output[:, 4:84]  # Class probabilities (80 values per anchor)
+        cls_scores = output[:, 4:(self.num_classes+4)]  # Class probabilities (80 values per anchor)
 
         # Convert bounding boxes to (x1, y1, x2, y2)
         cx, cy, w, h = bbox_data[:, 0], bbox_data[:, 1], bbox_data[:, 2], bbox_data[:, 3]

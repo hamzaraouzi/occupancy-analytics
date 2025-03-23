@@ -1,5 +1,5 @@
 import cv2
-
+import numpy as np
 
 def calculate_center(bbox):
     center = (int((bbox[0] + bbox[2]) // 2), int((bbox[1] + bbox[3]) // 2))

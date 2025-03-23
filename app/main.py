@@ -5,10 +5,8 @@ import threading
 from msghandler import MessageHandler
 import os
 import logging
-#from yolov8_tensorrt import YOLOv8TensorRT
-from bytetracker import BYTETracker
 from typing import List
-
+from tracker import ObjectTracker
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -38,7 +36,7 @@ def main(source, model, bootstrap_server, topic):
     source = os.getenv("source", source)
     bootstrap_server = os.getenv("bootstrap_server", bootstrap_server) 
     topic = os.getenv("topic", topic)
-    tracker = BYTETracker(track_thresh=0.5, match_thresh=0.8)
+    tracker = ObjectTracker(track_thresh=0.5, match_tresh=0.8)
     line = [(750, 200), (950, 1250)]
 
     line_crossing = LineCrossing(source=source, model=model, tracker=tracker,

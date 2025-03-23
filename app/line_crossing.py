@@ -1,7 +1,7 @@
 import cv2
 import logging
 from utils import (calculate_center, has_crossed_line,
-                   update_obj_history)
+                   update_obj_history, track_objects)
 
 from queue import Queue
 from yolov8_tensorrt import YOLOv8TensorRT
@@ -22,11 +22,10 @@ class LineCrossing(threading.Thread):
         self.obj_history = dict()
         self.runnig = False
 
-    def process_tracks(self, tracks, frame):
-        for track in tracks:
-            object_id = track.track_id
-            bbox = track.tlbr
-            cls = int(track.class_id)
+    def process_tracks(self, tracked_ojects, frame):
+        for obj in tracked_ojects:
+            object_id = obj["object_id"]
+            bbox = obj["bbox"]
 
             center = calculate_center(bbox=bbox)
             prev_center = self.obj_history.get(object_id, None)
@@ -35,8 +34,7 @@ class LineCrossing(threading.Thread):
                                                           self.line)
             if line_is_crossed:
                 logging.info(f"Object {object_id}: {direction} ")
-                self.msg_queue.put({"classe": cls,
-                                    "direction": direction})
+                self.msg_queue.put({"direction": direction})
 
                 self.obj_history = update_obj_history(
                     object_histories=self.obj_history,
@@ -55,6 +53,8 @@ class LineCrossing(threading.Thread):
                 break
 
             bboxes, scores, class_ids = self.model.infer(frame=frame)
+            tracked_objects = self.tracker.track_objects(bboxes, scores)
+            self.process_tracks(tracked_objects)
 
     def stop(self):
         self.running = False

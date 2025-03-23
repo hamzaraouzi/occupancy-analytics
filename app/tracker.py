@@ -1,7 +1,7 @@
 import numpy as np
 from yolox.tracker.byte_tracker import BYTETracker
 from argparse import Namespace
-
+import torch
 class ObjectTracker:
     def __init__(self, **kwargs):
         args = Namespace(**kwargs)
@@ -21,7 +21,7 @@ class ObjectTracker:
         if len(detections) == 0:
             return []
 
-        online_targets = self.tracker.update(detections, img_size=image_size, 
+        online_targets = self.tracker.update(torch.from_numpy(detections), img_size=image_size, 
                                              img_info=None)
         tracked_objects = []
         for track in online_targets:

@@ -5,6 +5,7 @@ from utils import (calculate_center, has_crossed_line,
 
 from queue import Queue
 from yolov8_tensorrt import YOLOv8TensorRT
+from tracker.byte_tracker import BYTETracker
 import threading
 
 logging.basicConfig(level=logging.INFO)
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class LineCrossing(threading.Thread):
-    def __init__(self, source, model, tracker, line, msg_queue: Queue):
+    def __init__(self, source, model, tracker: BYTETracker, line, msg_queue: Queue):
         super().__init__()
         self.model = YOLOv8TensorRT(engine_path=model)
         self.source = source
@@ -22,7 +23,7 @@ class LineCrossing(threading.Thread):
         self.obj_history = dict()
         self.runnig = False
 
-    def process_tracks(self, tracked_ojects, frame):
+    def process_tracks(self, tracked_ojects):
         for obj in tracked_ojects:
             object_id = obj["object_id"]
             bbox = obj["bbox"]

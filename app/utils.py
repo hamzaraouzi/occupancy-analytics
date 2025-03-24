@@ -1,5 +1,5 @@
 import cv2
-
+import numpy as np
 
 def calculate_center(bbox):
     center = (int((bbox[0] + bbox[2]) // 2), int((bbox[1] + bbox[3]) // 2))
@@ -35,6 +35,14 @@ def prepare_osd_frames(frame, bbox, center, line, obj_id):
                 1, (255, 0, 0), 2, cv2.LINE_AA)
     cv2.circle(frame, center, 5, (0, 255, 255), -1)
     cv2.line(frame, line[0], line[1], (0, 0, 255), 2)
+    return frame
+
+
+def draw_tracking_bbox(frame, bbox, obj_id):
+    cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
+    cv2.putText(frame, f'#{obj_id}', (int(bbox[0]), int(bbox[1])),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1, (255, 0, 0), 2, cv2.LINE_AA)
     return frame
 
 

@@ -1,7 +1,7 @@
 import cv2
 import logging
 from utils import (calculate_center, has_crossed_line,
-                   update_obj_history)
+                   update_obj_history, draw_tracking_bbox, write_output_video)
 
 from queue import Queue
 from yolov8_tensorrt import YOLOv8TensorRT
@@ -45,6 +45,7 @@ class LineCrossing(threading.Thread):
     def run(self):
         self.runnig = True
         cap = cv2.VideoCapture(self.source)
+        out_frames = list()
         while cap.isOpened():
 
             ret, frame = cap.read()
@@ -54,7 +55,13 @@ class LineCrossing(threading.Thread):
 
             bboxes, scores, class_ids = self.model.infer(frame=frame)
             tracked_objects = self.tracker.track_objects(bboxes, scores, (720, 1280))
-            self.process_tracks(tracked_objects)
+            # self.process_tracks(tracked_objects)
+            for obj in tracked_objects:
+                out_frames.append(draw_tracking_bbox(frame=frame,
+                                                     bbox=obj["bbox"],
+                                                     obj_id=obj["object_id"]))
+
+        write_output_video(out_frames, output_path="../../output.mp4")
 
     def stop(self):
         self.running = False

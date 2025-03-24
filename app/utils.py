@@ -38,6 +38,14 @@ def prepare_osd_frames(frame, bbox, center, line, obj_id):
     return frame
 
 
+def draw_tracking_bbox(frame, bbox, obj_id):
+    cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
+    cv2.putText(frame, f'#{obj_id}', (int(bbox[0]), int(bbox[1])),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1, (255, 0, 0), 2, cv2.LINE_AA)
+    return frame
+
+
 def update_obj_history(object_histories, object_id, center):
     if object_id not in object_histories:
         object_histories[object_id] = [center]

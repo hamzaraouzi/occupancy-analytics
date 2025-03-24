@@ -37,10 +37,10 @@ class LineCrossing(threading.Thread):
                 logging.info(f"Object {object_id}: {direction} ")
                 self.msg_queue.put({"direction": direction})
 
-                self.obj_history = update_obj_history(
-                    object_histories=self.obj_history,
-                    object_id=object_id,
-                    center=center)
+            self.obj_history = update_obj_history(
+                object_histories=self.obj_history,
+                object_id=object_id,
+                center=center)
 
     def run(self):
         self.runnig = True

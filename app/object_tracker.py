@@ -34,7 +34,7 @@ class ObjectTracker:
             track_id = track.track_id
             bbox = track.tlbr  # Top-left to bottom-right format
             tracked_objects.append({
-                "track_id": track_id,
+                "object_id": track_id,
                 "bbox": bbox.tolist(),
             })
         return tracked_objects
